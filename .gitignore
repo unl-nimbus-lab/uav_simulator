@@ -2,4 +2,4 @@
 env_files/
 
 #All files in mavlink_router
-mavlink_router/
+mavlink_router/main.conf
