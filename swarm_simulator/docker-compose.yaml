@@ -41,6 +41,66 @@ services:
       /bin/bash -c "export $$(cat /root/home/env_files/env4) &&
                     /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -I4 --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone4.parm"
 
+  sitl_5:
+    image: ghcr.io/unl-nimbus-lab/uav_simulator/ardupilot_docker
+    container_name: sitl_5
+    network_mode: host
+    volumes:
+      - ./env_files:/root/home/env_files
+    command: >
+      /bin/bash -c "export $$(cat /root/home/env_files/env5) &&
+                    /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -I5 --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone5.parm"
+
+  sitl_6:
+    image: ghcr.io/unl-nimbus-lab/uav_simulator/ardupilot_docker
+    container_name: sitl_6
+    network_mode: host
+    volumes:
+      - ./env_files:/root/home/env_files
+    command: >
+      /bin/bash -c "export $$(cat /root/home/env_files/env6) &&
+                    /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -I6 --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone6.parm"
+
+  sitl_7:
+    image: ghcr.io/unl-nimbus-lab/uav_simulator/ardupilot_docker
+    container_name: sitl_7
+    network_mode: host
+    volumes:
+      - ./env_files:/root/home/env_files
+    command: >
+      /bin/bash -c "export $$(cat /root/home/env_files/env7) &&
+                    /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -I7 --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone7.parm"
+
+  sitl_8:
+    image: ghcr.io/unl-nimbus-lab/uav_simulator/ardupilot_docker
+    container_name: sitl_8
+    network_mode: host
+    volumes:
+      - ./env_files:/root/home/env_files
+    command: >
+      /bin/bash -c "export $$(cat /root/home/env_files/env8) &&
+                    /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -I8 --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone8.parm"
+
+  sitl_9:
+    image: ghcr.io/unl-nimbus-lab/uav_simulator/ardupilot_docker
+    container_name: sitl_9
+    network_mode: host
+    volumes:
+      - ./env_files:/root/home/env_files
+    command: >
+      /bin/bash -c "export $$(cat /root/home/env_files/env9) &&
+                    /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -I9 --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone9.parm"
+
+  sitl_10:
+    image: ghcr.io/unl-nimbus-lab/uav_simulator/ardupilot_docker
+    container_name: sitl_10
+    network_mode: host
+    volumes:
+      - ./env_files:/root/home/env_files
+    command: >
+      /bin/bash -c "export $$(cat /root/home/env_files/env10) &&
+                    /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -I10 --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone10.parm"
+
   mavlink_router:
     image: ghcr.io/unl-nimbus-lab/uav_simulator/mavlink_router
     container_name: mavlink_router
@@ -49,6 +109,12 @@ services:
       - sitl_2
       - sitl_3
       - sitl_4
+      - sitl_5
+      - sitl_6
+      - sitl_7
+      - sitl_8
+      - sitl_9
+      - sitl_10
     stdin_open: true
     tty: true
     network_mode: "host"
