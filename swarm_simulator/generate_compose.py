@@ -6,9 +6,11 @@ startingMavrosPort = 14551
 startingMavrosBind = 14555
 startingCommsPort = 5762
 portIncrement = 10
-gazeboFlag = False
+gazeboFlagHost = False
+gazeboFlagCont = False
 companionProcess = False
 defaultCompanionImage = "ghcr.io/unl-nimbus-lab/arl-swarm/docker/drone_clustering"
+hostCatkinLocation = "/home/gphillip/catkin_ws"
 
 #check that the first input is an integer
 try:
@@ -33,9 +35,14 @@ if numberOfArgs > 2:
             continue
         else:
             match(sys.argv[i]):
-                case "-g":
-                    print("building for gazebo")
-                    gazeboFlag = True
+                case "-gh":
+                    print("building for Gazebo Host")
+                    print("Dont forget to run: export SVGA_VGPU10=0")
+                    gazeboFlagHost = True
+                    hostCatkinLocation = sys.argv[i+1]
+                case "-gc":
+                    print("building for Gazebo Container")
+                    gazeboFlagCont = True
                 case "-c":
                     print("Adding companion processes")
                     companionProcess = True
@@ -131,7 +138,7 @@ for i in range(1,n+1):
     envVol =            '      - ./env_files:/root/home/env_files\n'
     command =           '    command: >\n'
     comman1 =           '      /bin/bash -c "export $$(cat /root/home/env_files/env' + var + ') &&\n'
-    if (gazeboFlag):
+    if (gazeboFlagHost or gazeboFlagCont):
         comman2 =       '                    /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -f gazebo-drone' + var +' -I' + var + ' --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone' + var + '.parm"\n'
     else:
         comman2 =       '                    /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -I' + var + ' --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone' + var + '.parm"\n'
@@ -180,9 +187,108 @@ command1 =          '      /bin/bash -c "mavlink-routerd -c /root/home/mavlink_r
 f.writelines([options1,options2,network,volume,volume1,command,command1])
 f.close()
 
-if (gazeboFlag):
+if (gazeboFlagCont):
     ##Generate Gazebo world
+    #generate the 'base' world first
     f = open("../shared/iq_sim/worlds/multi_drone.world","w")
+    f.writelines([
+    '<?xml version="1.0"?>\n',
+    '<sdf version="1.5">\n',
+    '  <world name="default">\n',
+    '    <physics type="ode">\n',
+    '      <ode>\n',
+    '        <solver>\n',
+    '          <type>quick</type>\n',
+    '          <iters>100</iters>\n',
+    '          <sor>1.0</sor>\n',
+    '        </solver>\n',
+    '        <constraints>\n',
+    '          <cfm>0.0</cfm>\n',
+    '          <erp>0.9</erp>\n',
+    '          <contact_max_correcting_vel>0.1</contact_max_correcting_vel>\n',
+    '          <contact_surface_layer>0.0</contact_surface_layer>\n',
+    '        </constraints>\n',
+    '      </ode>\n',
+    '      <real_time_update_rate>-1</real_time_update_rate>\n',
+    '    </physics>\n\n',
+
+    '    <model name="ground_plane">\n',
+    '      <static>true</static>\n',
+    '      <link name="link">\n',
+    '        <collision name="collision">\n',
+    "          <geometry>\n",
+    "            <plane>\n",
+    "              <normal>0 0 1</normal>\n",
+    "              <size>5000 5000</size>\n",
+    "            </plane>\n",
+    "          </geometry>\n",
+    "          <surface>\n",
+    "            <friction>\n",
+    "              <ode>\n",
+    "                <mu>1</mu>\n",
+    "                <mu2>1</mu2>\n",
+    "              </ode>\n",
+    "            </friction>\n",
+    "          </surface>\n",
+    "        </collision>\n",
+    '        <visual name="runway">\n',
+    "          <pose>000 0 0.005 0 0 0</pose>\n",
+    "          <cast_shadows>false</cast_shadows>\n",
+    "          <geometry>\n",
+    "            <plane>\n",
+    "              <normal>0 0 1</normal>\n",
+    "              <size>1829 45</size>\n",
+    "            </plane>\n",
+    "          </geometry>\n",
+    "          <material>\n",
+    "            <script>\n",
+    "              <uri>file://media/materials/scripts/gazebo.material</uri>\n",
+    "              <name>Gazebo/Runway</name>\n",
+    "            </script>\n",
+    "          </material>\n",
+    "        </visual>\n\n",
+
+    '        <visual name="grass">\n',
+    "          <pose>0 0 -0.1 0 0 0</pose>\n",
+    "          <cast_shadows>false</cast_shadows>\n",
+    "          <geometry>\n",
+    "            <plane>\n",
+    "              <normal>0 0 1</normal>\n",
+    "              <size>5000 5000</size>\n",
+    "            </plane>\n",
+    "          </geometry>\n",
+    "          <material>\n",
+    "            <script>\n",
+    "              <uri>file://media/materials/scripts/gazebo.material</uri>\n",
+    "              <name>Gazebo/Grass</name>\n",
+    "            </script>\n",
+    "          </material>\n",
+    "        </visual>\n\n",
+
+    "      </link>\n",
+    "    </model>\n\n",
+
+    "    <include>\n",
+    "      <uri>model://sun</uri>\n",
+    "    </include>\n",
+    ])
+
+    #Now add the correct number of drones
+    for i in range(1,n+1):
+        var = str(i)
+        line1 = '    <model name="drone' + var + '">\n'
+        line2 = '      <pose> 0 ' + var +' 0 0 0 0</pose>\n'
+        line3 = '      <include>\n'
+        line4 = '        <uri>model://drone' + var + '</uri>\n'
+        line5 = '      </include>\n'
+        line6 = '    </model>\n'
+        f.writelines([line1,line2,line3,line4,line5,line6])
+
+    f.writelines(["\n","  </world>\n","</sdf>"])
+    f.close()
+
+elif (gazeboFlagHost):
+    f = open(hostCatkinLocation,"w")
     #generate the 'base' world first
     f.writelines([
     '<?xml version="1.0"?>\n',
