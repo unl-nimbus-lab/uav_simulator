@@ -7,11 +7,8 @@ startingMavrosBind = 14555
 startingCommsPort = 5762
 portIncrement = 10
 gazeboFlag = False
-noCompanionProcess = False
-defaultCompanionImage = "ghcr.io/grantphllps/clustering:latest"
-
-
-defaultCompanion = "ghcr.io/grantphllps/clustering:latest"
+companionProcess = False
+defaultCompanionImage = "ghcr.io/unl-nimbus-lab/arl-swarm/docker/drone_clustering"
 
 #check that the first input is an integer
 try:
@@ -39,9 +36,9 @@ if numberOfArgs > 2:
                 case "-g":
                     print("building for gazebo")
                     gazeboFlag = True
-                case "-n":
-                    print("not adding companion processes")
-                    noCompanionProcess = True
+                case "-c":
+                    print("Adding companion processes")
+                    companionProcess = True
                 case "-d":
                     try:
                         print("user specified companion processes: " + sys.argv[i+1])
@@ -127,7 +124,7 @@ for i in range(1,n+1):
     #nvar = str(i-1)
 
     container =         "  sitl_" + var + ":\n"
-    image =             "    image: ghcr.io/grantphllps/ardupilot_docker:latest\n"
+    image =             "    image: ghcr.io/unl-nimbus-lab/uav_simulator/ardupilot_docker\n"
     containerName =     "    container_name: sitl_" + var + "\n"
     network =           "    network_mode: host\n"
     volumes =           '    volumes:\n'
@@ -141,7 +138,7 @@ for i in range(1,n+1):
     
     f.writelines([container,image,containerName,network,volumes,envVol,command,comman1,comman2,"\n"])
 
-    if (noCompanionProcess == False):
+    if (companionProcess == True):
         container =         "  clustering_" + var + ":\n"
         depends =           "    depends_on:\n"
         depend1 =           "      - sitl_" + var + "\n"
@@ -162,7 +159,7 @@ for i in range(1,n+1):
 
 #Mavlink router
 container =         "  mavlink_router:\n"
-image =             "    image: ghcr.io/grantphllps/mavlink_router:latest\n"
+image =             "    image: ghcr.io/unl-nimbus-lab/uav_simulator/mavlink_router\n"
 containerName =     "    container_name: mavlink_router\n"
 depends =           "    depends_on:\n"
 f.writelines([container,image,containerName,depends])
