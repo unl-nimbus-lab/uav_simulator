@@ -9,7 +9,7 @@ Docker Engine needs to be installed on the host machine, here is a link to the i
 
 `https://docs.docker.com/engine/install/ubuntu/`
 
-# Clone this repository onto your machine and find the `swarm_simulator` directory:
+# Clone the repository and navigate to the swarm_simulator directory
 
 `cd uav_simulator/swarm_simulator`
 
@@ -28,13 +28,21 @@ The first option specifies the number of UAVs to simulate (1-12). For instance, 
 
 `python3 generate_compose.py 5`
 
+then to start the simulation:
+
+`sudo docker-compose up`
+
 ## Include a Companion process -c
 To include a ROS-based companion process use the -c flag as follows:
 
 `python3 generate_compose.py 4 -c`
 
+then to start the simulation:
+
+`sudo docker-compose up`
+
 There is a default companion process specified in generate_compose.py that starts the NIMBUS clustering control. A companion process can
-be used without the `-c` flag. By default, the SITL ports exposed for companion processes are 5XX3 starting at 14561 for agent 1, 14571
+be used without the `-c` flag. By default, the SITL ports exposed for companion processes are 14XX1 starting at 14561 for agent 1, 14571
 for agent 2 and so on.
 
 ### MAVROS
@@ -46,8 +54,34 @@ agent_2: `fcu_url:=udp://127.0.0.1:14571@14575`
 
 and increment the port by 10 for each subsequent agent
  
- ## Gazebo
+## Gazebo
+Gazebo provides a more realistic simulation environment as well as the ability to include additional sensors, obstacles, and provides
+a nice visual component to your simulation. 
+
+### Installing Gazebo Natively (recommended) 
+Gazebo and ROS can be installed on the host machine (recommended) by following the steps 
+outlined in https://github.com/Intelligent-Quads/iq_tutorials/blob/master/docs/installing_gazebo_arduplugin.md and 
+https://github.com/Intelligent-Quads/iq_tutorials/blob/master/docs/installing_gazebo_arduplugin.md (you can skip step 3 in the 
+second README). 
+
+### Containerized Gazebo (not recommended)
+Alternativly a seperate docker compose file can be used to start a container with Gazebo already installed, this can be launched 
+by navigating to the `gazebo_docker` directory and running the command: 
+
+`sudo docker-compose up` 
+
+The container can be acessed by launching a VNC client (Remmina works fine for Ubuntu) and opening up `localhost:5901` and
+the password is `password`. Again, it is recommneded that Gazebo be run natively as the containerized version performs
+significantly worse. 
+
+### Proceeding with Gazebo
+
+In order to generate the gazebo portion of
+the compose file, specify the `-g` flag:
  
+`python3 generate_compose.py 5 -g`
+
+NOTE: If you are going to use Gazebo, the gazebo component needs to be 
 
 
 
