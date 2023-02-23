@@ -21,8 +21,6 @@ and if any companion process should be used. Below is an example to generate a c
 
 `python3 generate_compose.py 1`
 
-## generate_compose.py command-line parameters:
-
 ## Number of Vehicles
 The first option specifies the number of UAVs to simulate (1-12). For instance, to generate a compose file for 5 SITL instances would be:
 
@@ -76,13 +74,20 @@ significantly worse.
 
 ### Proceeding with Gazebo
 
-In order to generate the gazebo portion of
-the compose file, specify the `-g` flag:
- 
+In order to generate the gazebo portion of the compose file, specify the `-g` flag:
+
 `python3 generate_compose.py 5 -g`
 
-NOTE: If you are going to use Gazebo, the gazebo component needs to be 
+**DO NOT** run the compose file yet. Go to the `/home/catkin_ws` folder either on the host machine or in the VNCd container and
+run `catkin build`. Once the catkin build finishes, run `. devel/setup.bash`. **NOTE** if you are not using the container but
+you are using Ubuntu on a virtual machine, run `export SVGA_VGPU10=0` to prevent erros in the future. Finally launch Gazebo with:
 
+`roslaunch iq_sim multi_drone.launch`
 
+After a Gazebo window appears displaying the drones, proceed as normal:
 
+`cd ~/uav_simulator/swarm_simulator`
 
+and
+
+`sudo docker-compose up`
