@@ -10,7 +10,7 @@ gazeboFlagHost = False
 gazeboFlagCont = False
 companionProcess = False
 defaultCompanionImage = "ghcr.io/unl-nimbus-lab/arl-swarm/docker/drone_clustering"
-hostCatkinLocation = "/home/gphillip/catkin_ws"
+hostCatkinLocation = "home/gphillip/catkin_ws/src/iq_sim/worlds"
 
 #check that the first input is an integer
 try:
@@ -117,6 +117,14 @@ mode =      "Mode=Normal\n"
 address =   "Address = 0.0.0.0\n"
 port =      "Port = 4242\n"
 f.writelines([name,mode,address,port])
+
+#Add the secondary UPD connection
+name =      "[UdpEndpoint collision]\n"
+mode =      "Mode=Normal\n"
+address =   "Address = 0.0.0.0\n"
+port =      "Port = 4243\n"
+f.writelines([name,mode,address,port])
+
 f.close()
 
 print("Mavlink router configuration generated successfully!")
@@ -277,7 +285,7 @@ if (gazeboFlagCont):
     for i in range(1,n+1):
         var = str(i)
         line1 = '    <model name="drone' + var + '">\n'
-        line2 = '      <pose> 0 ' + var +' 0 0 0 0</pose>\n'
+        line2 = '      <pose> 0 ' + str(-1*i*(1.11)) +' 0 0 0 0</pose>\n'
         line3 = '      <include>\n'
         line4 = '        <uri>model://drone' + var + '</uri>\n'
         line5 = '      </include>\n'
@@ -376,7 +384,7 @@ elif (gazeboFlagHost):
     for i in range(1,n+1):
         var = str(i)
         line1 = '    <model name="drone' + var + '">\n'
-        line2 = '      <pose> 0 ' + var +' 0 0 0 0</pose>\n'
+        line2 = '      <pose> 0 ' + str(-1*i*(1.11)) +' 0 0 0 0</pose>\n'
         line3 = '      <include>\n'
         line4 = '        <uri>model://drone' + var + '</uri>\n'
         line5 = '      </include>\n'
