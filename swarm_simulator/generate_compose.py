@@ -96,7 +96,7 @@ for i in range(1,n + 1):
 print("Companion process files generated successfully!")
 
 #Generate the mavlink router file
-mavlinkConfig = "./mavlink_router/main.conf"
+mavlinkConfig = "./mavlink_router/mavlink/main.conf"
 f = open(mavlinkConfig,"w")
 
 name = "[TcpServer Default]\n"
@@ -118,11 +118,45 @@ address =   "Address = 0.0.0.0\n"
 port =      "Port = 4242\n"
 f.writelines([name,mode,address,port])
 
-#Add the secondary UPD connection
+#Add the secondary UPD connection for collision avoidance
 name =      "[UdpEndpoint collision]\n"
 mode =      "Mode=Normal\n"
 address =   "Address = 0.0.0.0\n"
 port =      "Port = 4243\n"
+f.writelines([name,mode,address,port])
+
+f.close()
+
+print("Mavlink router configuration generated successfully!")
+
+#Generate the xbee router file
+mavlinkConfig = "./mavlink_router/xbee/main.conf"
+f = open(mavlinkConfig,"w")
+
+name = "[TcpServer Default]\n"
+address = "Address = 0.0.0.0\n"
+port = "Port = 4440\n\n"
+
+f.writelines([name,address,port])
+
+for i in range(1,n + 1):
+    name =      "[TcpEndpoint sitl_" + str(i) + "]\n"
+    address =   "Address = 0.0.0.0\n"
+    port =      "Port = " + str(startingCommsPort + i*portIncrement) + "\n\n"
+    f.writelines([name,address,port])
+
+#Add the main UPD connection
+name =      "[UdpEndpoint omega]\n"
+mode =      "Mode=Normal\n"
+address =   "Address = 0.0.0.0\n"
+port =      "Port = 4439\n"
+f.writelines([name,mode,address,port])
+
+#Add the secondary UPD connection for collision avoidance
+name =      "[UdpEndpoint collision]\n"
+mode =      "Mode=Normal\n"
+address =   "Address = 0.0.0.0\n"
+port =      "Port = 4438\n"
 f.writelines([name,mode,address,port])
 
 f.close()
@@ -190,9 +224,32 @@ options1 =          "    stdin_open: true\n"
 options2 =          "    tty: true\n"
 network =           '    network_mode: "host"\n'
 volume =            '    volumes:\n'
-volume1 =           '      - ./mavlink_router:/root/home/mavlink_router_files\n'
+volume1 =           '      - ./mavlink_router/mavlink:/root/home/mavlink_router_files\n'
 command =           '    command: >\n'
-command1 =          '      /bin/bash -c "mavlink-routerd -c /root/home/mavlink_router_files/main.conf"'
+command1 =          '      /bin/bash -c "mavlink-routerd -c /root/home/mavlink_router_files/main.conf"\n\n'
+
+
+f.writelines([options1,options2,network,volume,volume1,command,command1])
+
+
+#Mavlink router for Xbee Comms
+container =         "  xbee_router:\n"
+image =             "    image: ghcr.io/unl-nimbus-lab/uav_simulator/mavlink_router\n"
+containerName =     "    container_name: xbee_router\n"
+depends =           "    depends_on:\n"
+f.writelines([container,image,containerName,depends])
+#Mavlink router depends
+for i in range(1,n+1):
+    var = str(i)    
+    depend =           "      - sitl_" + var + "\n"
+    f.write(depend)
+options1 =          "    stdin_open: true\n"
+options2 =          "    tty: true\n"
+network =           '    network_mode: "host"\n'
+volume =            '    volumes:\n'
+volume1 =           '      - ./mavlink_router/xbee:/root/home/mavlink_router_files\n'
+command =           '    command: >\n'
+command1 =          '      /bin/bash -c "mavlink-routerd -c /root/home/mavlink_router_files/main.conf"\n\n'
 
 
 f.writelines([options1,options2,network,volume,volume1,command,command1])
