@@ -175,7 +175,7 @@ for i in range(1,n+1):
 
         f.writelines([container,depends,depend1,depend2,network,image,containerName,options1,options2,volumes,envVol,command,comman1,comman2,comman3,"\n"])
 
-#Mavlink router
+#Mavlink router for Mavlink Comms
 container =         "  mavlink_router:\n"
 image =             "    image: ghcr.io/unl-nimbus-lab/uav_simulator/mavlink_router\n"
 containerName =     "    container_name: mavlink_router\n"
