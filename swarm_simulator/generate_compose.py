@@ -9,7 +9,7 @@ portIncrement = 10
 gazeboFlagHost = False
 gazeboFlagCont = False
 companionProcess = False
-defaultCompanionImage = "ghcr.io/unl-nimbus-lab/arl-swarm/docker/drone_clustering"
+defaultCompanionImage = "grantphllps/arl_swarm"
 hostCatkinLocation = "home/gphillip/catkin_ws/src/iq_sim/worlds"
 
 #check that the first input is an integer
@@ -139,7 +139,7 @@ for i in range(1,n+1):
     #nvar = str(i-1)
 
     container =         "  sitl_" + var + ":\n"
-    image =             "    image: ghcr.io/unl-nimbus-lab/uav_simulator/ardupilot_docker\n"
+    image =             "    image: grantphllps/ardupilot\n"
     containerName =     "    container_name: sitl_" + var + "\n"
     network =           "    network_mode: host\n"
     volumes =           '    volumes:\n'
@@ -177,7 +177,7 @@ for i in range(1,n+1):
 
 #Mavlink router for Mavlink Comms
 container =         "  mavlink_router:\n"
-image =             "    image: ghcr.io/unl-nimbus-lab/uav_simulator/mavlink_router\n"
+image =             "    image: grantphllps/mavlink_router\n"
 containerName =     "    container_name: mavlink_router\n"
 depends =           "    depends_on:\n"
 f.writelines([container,image,containerName,depends])
