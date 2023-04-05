@@ -79,32 +79,6 @@ services:
                     export $$(cat /root/home/env_files/ros_env3)
                     roslaunch --wait src/clustering_control/launch/clustering_control_sim.launch system_ID:=$${SYS_ID} clusterID:=$${CLUSTER_ID} clusterPosition:=$${CLUSTER_POSITION} clusterSize:=$${CLUSTER_SIZE} clusterRadius:=$${CLUSTER_RADIUS} agentAlt:=$${AGENT_ALT} homeLat:=$${HOME_LAT} homeLon:=$${HOME_LON} homeAlt:=$${HOME_ALT} rally1Lat:=$${RALLY1LAT} rally1Lon:=$${RALLY1LON} rally2Lat:=$${RALLY2LAT} rally2Lon:=$${RALLY2LON} fcu_url:=$${PORT} tgt_system:=$${SYS_ID} tgt_component:=$${COMP_ID}"
 
-  sitl_4:
-    image: ghcr.io/unl-nimbus-lab/uav_simulator/ardupilot_docker
-    container_name: sitl_4
-    network_mode: host
-    volumes:
-      - ./env_files:/root/home/env_files
-    command: >
-      /bin/bash -c "export $$(cat /root/home/env_files/env4) &&
-                    /home/ardupilot/Tools/autotest/sim_vehicle.py --vehicle $${VEHICLE} -w --custom-location=$${LAT},$${LON},$${ALT},$${DIR} --no-rebuild -I4 --add-param-file=/home/ardupilot/Tools/autotest/default_params/gazebo-drone4.parm"
-
-  clustering_4:
-    depends_on:
-      - sitl_4
-      - mavlink_router
-    network_mode: host
-    image: ghcr.io/unl-nimbus-lab/arl-swarm/docker/drone_clustering
-    container_name: clustering_4
-    stdin_open: true
-    tty: true
-    volumes:
-      - ./env_files:/root/home/env_files
-    command: >
-      /bin/bash -c "source /home/catkin_ws/devel/setup.bash &&
-                    export $$(cat /root/home/env_files/ros_env4)
-                    roslaunch --wait src/clustering_control/launch/clustering_control_sim.launch system_ID:=$${SYS_ID} clusterID:=$${CLUSTER_ID} clusterPosition:=$${CLUSTER_POSITION} clusterSize:=$${CLUSTER_SIZE} clusterRadius:=$${CLUSTER_RADIUS} agentAlt:=$${AGENT_ALT} homeLat:=$${HOME_LAT} homeLon:=$${HOME_LON} homeAlt:=$${HOME_ALT} rally1Lat:=$${RALLY1LAT} rally1Lon:=$${RALLY1LON} rally2Lat:=$${RALLY2LAT} rally2Lon:=$${RALLY2LON} fcu_url:=$${PORT} tgt_system:=$${SYS_ID} tgt_component:=$${COMP_ID}"
-
   mavlink_router:
     image: ghcr.io/unl-nimbus-lab/uav_simulator/mavlink_router
     container_name: mavlink_router
@@ -112,28 +86,11 @@ services:
       - sitl_1
       - sitl_2
       - sitl_3
-      - sitl_4
     stdin_open: true
     tty: true
     network_mode: "host"
     volumes:
       - ./mavlink_router/mavlink:/root/home/mavlink_router_files
-    command: >
-      /bin/bash -c "mavlink-routerd -c /root/home/mavlink_router_files/main.conf"
-
-  xbee_router:
-    image: ghcr.io/unl-nimbus-lab/uav_simulator/mavlink_router
-    container_name: xbee_router
-    depends_on:
-      - sitl_1
-      - sitl_2
-      - sitl_3
-      - sitl_4
-    stdin_open: true
-    tty: true
-    network_mode: "host"
-    volumes:
-      - ./mavlink_router/xbee:/root/home/mavlink_router_files
     command: >
       /bin/bash -c "mavlink-routerd -c /root/home/mavlink_router_files/main.conf"
 
