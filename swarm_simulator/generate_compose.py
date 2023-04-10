@@ -9,7 +9,7 @@ portIncrement = 10
 gazeboFlagHost = False
 gazeboFlagCont = False
 companionProcess = False
-defaultCompanionImage = "grantphllps/arl_swarm"
+defaultCompanionImage = "grantphllps/arl_swarm_sim"
 hostCatkinLocation = "home/gphillip/catkin_ws/src/iq_sim/worlds"
 
 #check that the first input is an integer
